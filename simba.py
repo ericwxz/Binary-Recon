@@ -86,8 +86,10 @@ def help():
 
 def main():
 	file = sys.argv[1]
+	#If the first argument is a file, we need to start looking for flags at the second index
 	if (os.path.exists(file)):
 		j=2
+	#If the first argument was not a file we look for flags at the first argument
 	else:
 		j=1
 
@@ -102,50 +104,54 @@ def main():
 		argset.add(sys.argv[j])
 		j = j+1
 
-	if (os.path.exists(file)):
-		for x in argset:
-			print x 
-			if x not in binlist:
-				print('You gave a file but no scans to run on it!')
-				exit()
-	elif((sys.argv[1] != '-n') or len(argset) > 1):
-		print('Sorry that is im-proper format. \nTry using the -h flag to fix it')
-		exit()
-
 	#If statement to determine whether all arguments given are a flag for this program, and exits with an exit message if any argument is not.
 	if(not(argset.issubset(fullargset))):
 		print('\n\nThe flag \"' + argset.difference(fullargset).pop() + '\" has no use with this tool. \nPlease try the -h flag to see the proper flags for each scan.\n' )
 		exit()
 
-	#If -h flag is anywhere in the argset this forces the help function to be shown.
-	if '-h' in argset:
-		help()
-	
 	#If no arguments are given to the function this exits the function with a 	message.
 	if (len(argset) < 1):
 		print('No arguments given')
 		exit()
-	else:	
+
+	#If the file exists, and the flags given are in the 
+	inlist = False
+	if (os.path.exists(file)):
+		for x in argset:
+			if x not in binlist:
+				inlist = inlist or False
+			elif x in binlist:
+				inlist = inlist or True
+		if inlist == False:
+			exit()
+	elif((sys.argv[1] != '-n') or len(argset) > 1):
+		print('Sorry that is im-proper format. \nTry using the -h flag to fix it')
+		exit()
+
+	#If -h flag is anywhere in the argset this forces the help function to be shown.
+	if '-h' in argset:
+		help()
+		
 		#For loop to run all the scans based on the flags given in order at 	command line.
-		for i in range(1, len(sys.argv)):
-			#Jump to angr function.
-			if(sys.argv[i] == '-a'):
-				fullAngrScan()
-			#Jump to simple angr function.
-			elif(sys.argv[i] == '-aB'):
-				halfAngrScan()
-			#Jump to Netcat service heartbeat.
-			elif(sys.argv[i] == '-n'):
-				netcatHeartBeat()
-			#Jump to binwalk signature and entropy scan.
-			elif(sys.argv[i] == '-b'):
-				binwalkSigEntropyScan()
-			#Jump to radare2 Scan.
-			elif(sys.argv[i] == '-r'):
-				radare2Scan()
-			#If the argument is -h, just continue the for loop.
-			elif(sys.argv[i] == '-h'):
-				continue
+	for i in range(1, len(sys.argv)):
+		#Jump to angr function.
+		if(sys.argv[i] == '-a'):
+			fullAngrScan()
+		#Jump to simple angr function.
+		elif(sys.argv[i] == '-aB'):
+			halfAngrScan()
+		#Jump to Netcat service heartbeat.
+		elif(sys.argv[i] == '-n'):
+			netcatHeartBeat()
+		#Jump to binwalk signature and entropy scan.
+		elif(sys.argv[i] == '-b'):
+			binwalkSigEntropyScan()
+		#Jump to radare2 Scan.
+		elif(sys.argv[i] == '-r'):
+			radare2Scan()
+		#If the argument is -h, just continue the for loop.
+		elif(sys.argv[i] == '-h'):
+			continue
 	
 
 
