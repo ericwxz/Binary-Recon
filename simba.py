@@ -2,7 +2,7 @@
 #Revision: 1
 #Authors: Elijah Sheets & Eric Zhang
 #Project Start:7/17/2017
-#Last Revision:7/18/2017
+#Last Edit:7/19/2017
 #Goal: Through collaboration with a fellow NREIP intern build a Binary Reconnaissance Tool to run specific scans and or analysis.
 
 #imports
