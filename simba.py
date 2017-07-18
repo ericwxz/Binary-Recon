@@ -11,6 +11,7 @@ import sys
 import angr
 import r2pipe
 import binwalk
+import socket
 
 #A function to run Binwalk Signature and Entropy Scan.
 def binwalkSigEntropyScan(file):
@@ -31,8 +32,21 @@ def binwalkSigEntropyScan(file):
 
 
 #A function to run a Netcat Service Heartbeat.
-def netcatHeartBeat(): 
-	print ('rawr3')
+def netcatHeartBeat():
+
+	ip = raw_input('Input an IP to run a Netcat Service Heartbeat.\n')
+	try:
+		socket.inet_aton(addr)
+	except: socket.error
+
+	port = raw_input('Input a Port on the IP.\n')
+	while(not(port.isdigit())):
+		port = raw_input('Input a Port on the IP.\n')
+
+
+	cmd = 'while `nc -nn -vv -z -w3 '  + ip + ' ' + port + ' > /dev/null`; do echo "OK"; sleep 1; done; echo "DOWN"; while (true); do echo "***DOWN***"; sleep 5; done'
+
+	os.system(cmd)
 	
 
 #A function to run angr analysis.
