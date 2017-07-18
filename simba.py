@@ -125,6 +125,7 @@ def main():
 
 	#Generate a set of all possible flags for this tool.
 	fullargset = set(['-a','-aB','-b','-n','-r','-h'])
+	#A set of all the flags that require a binary file to scan.
 	binlist = ['-a','-aB','-b','-r']
 	#Initialize a set of to contain all the flags passed in the command line.
 	argset = set([])
@@ -152,14 +153,19 @@ def main():
 	#Complicated loop. Checks if a file is passed. If it is, it checks the flags and makes sure at least on of the flags requires a binary (from our predetermined list binlist), as long as one of these flags is in the list it runs, otherwise it quits. Also if no file is given it makes sure that only either -n or -h flags are passed.
 	inlist = False
 	if (os.path.exists(file)):
+		#Each element in argset
 		for x in argset:
+			#If x is not in the binlist inlist with False (If inlist is already true this does nothing, but if its false it stays false).
 			if x not in binlist:
 				inlist = inlist or False
+			#If x is in binlist or inlist with true, this will set inlist to true.
 			elif x in binlist:
 				inlist = inlist or True
+		#We make it through the for loop and inlist is still true, that means a binary was given but no flags for scans.
 		if inlist == False:
 			print('Sorry, if you give a path, you must also supply a flag for a scan')
 			exit()
+	#Check that if only one argument is given it MUST be -n
 	elif((sys.argv[1] != '-n') or (len(argset) > 1)):
 		print('Sorry that is im-proper format. \nTry using the -h flag to fix it')
 		exit()
