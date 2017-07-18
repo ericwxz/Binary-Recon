@@ -9,22 +9,22 @@
 import os
 import sys
 import angr
-import binwalk
+#import binwalk
 import r2pipe
 
 #A function to run Binwalk Signature and Entropy Scan.
-def binwalkSigEntropyScan():
-	for module in binwalk.scan(file, 
-				   signature=True,  
-				   quiet=True):
-		print "%s Binwalk Signature Scan:" % module.name
-		for result in module.results:
-			print "\t%s    0x%.8x    %s" % (result.file.name, 
-							result.offset,
-							result.description)
-	print "Binwalk Entropy Scan:"
-	binwalk.scan(file, entropy=True)
-
+def binwalkSigEntropyScan(file):
+	#for module in binwalk.scan(file, 
+	#			   signature=True,  
+	#			   quiet=True):
+	#	print "%s Binwalk Signature Scan:" % module.name
+	#	for result in module.results:
+	#		print "\t%s    0x%.8x    %s" % (result.file.name, 
+	#						result.offset,
+	#						result.description)
+	#print "Binwalk Entropy Scan:"
+	#binwalk.scan(file, entropy=True)
+	print ('rawr')
 #A function to run a Netcat Service Heartbeat.
 def netcatHeartBeat(): 
 	print ('rawr3')
@@ -55,9 +55,9 @@ def halfAngrScan(file):
 	print(proj.arch)
 
 #A function to run radare2 analysis.
-def radare2Scan():
+def radare2Scan(filepath):
 	#setup
-	r2 = r2pipe.open(file)
+	r2 = r2pipe.open(filepath)
 	r2.cmd("aaa")
 	r2.cmd("s main")
 
@@ -76,25 +76,25 @@ def radare2Scan():
 	
 	#ask if user wants to see all functions
 	uinput = raw_input("\nDo you want to see all functions? (y/n)")
-		if uinput == 'y' or uinput == 'Y':
-			print r2.cmd('afl')
+	if uinput == 'y' or uinput == 'Y':
+		print r2.cmd('afl')
 	
 	#ask if user wants to run readelf or objdump
 	if 'elf' in bintype:
 		uinput = raw_input("\nDo you want to run readelf -a?(y/n)")
 		if uinput == 'y' or uinput == 'Y':
 			print "\x1B[31m" + "\nReadelf \n" + "\x1B[0m"
-			print r2.cmd("!readelf -a " + file)
+			print r2.cmd("!readelf -a " + filepath)
 
 	else:
 		uinput = raw_input("\nDo you want to run objdump -h?(y/n)")
 		if uinput == 'y' or uinput == 'Y':
 			print "\x1B[31m" + "\nObjdump -h\n" + "\x1B[0m"
-			print r2.cmd("!objdump -h " + file)
+			print r2.cmd("!objdump -h " + filepath)
 	#ask if user wants to run strings
 	uinput = raw_input("\nDo you want to call strings? (y/n)")
-		if uinput == 'y' or uinput == 'Y':
-			print r2.cmd("!strings " + file)
+	if uinput == 'y' or uinput == 'Y':
+		print r2.cmd("!strings " + filepath)
 
 #A help function to explain which flags runs which scan.
 def help():
@@ -169,10 +169,10 @@ def main():
 			netcatHeartBeat()
 		#Jump to binwalk signature and entropy scan.
 		elif(sys.argv[i] == '-b'):
-			binwalkSigEntropyScan()
+			binwalkSigEntropyScan(file)
 		#Jump to radare2 Scan.
 		elif(sys.argv[i] == '-r'):
-			radare2Scan()
+			radare2Scan(file)
 		#If the argument is -h, just continue the for loop.
 		elif(sys.argv[i] == '-h'):
 			continue
