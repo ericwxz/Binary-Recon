@@ -42,19 +42,31 @@ def help():
 
 def main():
 	file = sys.argv[1]
-	if (not os.path.exists(file)):
-		exit()
+	if (os.path.exists(file)):
+		j=2
+	else:
+		j=1
 
 	#Generate a set of all possible flags for this tool.
 	fullargset = set(['-a','-aB','-b','-n','-r','-h'])
+	binlist = ['-a','-aB','-b','-r']
 	#Initialize a set of to contain all the flags passed in the command line.
 	argset = set([])
-	j = 2
 
 	#Grab all arguments given at command line and put them into the argset.
 	while(j < len(sys.argv)):
 		argset.add(sys.argv[j])
 		j = j+1
+
+	if (os.path.exists(file)):
+		for x in argset:
+			print x 
+			if x not in binlist:
+				print('You gave a file but no scans to run on it!')
+				exit()
+	elif((sys.argv[1] != '-n') or len(argset) > 1):
+		print('Sorry that is im-proper format. \nTry using the -h flag to fix it')
+		exit()
 
 	#If statement to determine whether all arguments given are a flag for this program, and exits with an exit message if any argument is not.
 	if(not(argset.issubset(fullargset))):
