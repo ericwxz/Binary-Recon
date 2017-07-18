@@ -3,7 +3,7 @@
 #Authors: Elijah Sheets & Eric Zhang
 #Project Start:7/17/2017
 #Last Revision:7/18/2017
-#Goal: Through collaboration with a fellow NREIP intern build a Binary Reconnaissance 	     Tool to run specific scans and or analysis.
+#Goal: Through collaboration with a fellow NREIP intern build a Binary Reconnaissance Tool to run specific scans and or analysis.
 
 #imports
 import os
@@ -24,6 +24,7 @@ def binwalkSigEntropyScan(file):
 							result.description)
 	print "Binwalk Entropy Scan:"
 	binwalk.scan(file, entropy=True)
+
 #A function to run a Netcat Service Heartbeat.
 def netcatHeartBeat(): 
 	print ('rawr3')
