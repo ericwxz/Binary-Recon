@@ -33,25 +33,31 @@ def netcatHeartBeat():
 #A function to run angr analysis.
 def fullAngrScan(file):
 	print('\nLoading the Binary...')
+	#Using angr to attempt to load the Binary File.
 	proj = angr.Project(file, load_options = {'auto_load_libs':False})
+	#Running a Control Flow Graph Analysis on the Binary.
 	cfg = proj.analyses.CFG()
 	print('\nBinary Architecture:') 
+	#Print out the Binary Architecture.
 	print(proj.arch)
 	print('\nFunction List\n')
+	#Loop to print out all the function lists on separate lines.
 	count = len(cfg.functions.items())
 	i = 0
 	for i in cfg.functions.items():
 		print i	
 	print('\nStack Protection:')
+	#Show the binary Stack Protection state.
 	print(proj.loader.aslr)
 	print('\n')
 
 #A function to run angr analysis without CFG, Function list, or Stack protection.
 def halfAngrScan(file):
 	print('\nLoading the Binary...')
+	#Using angr to attempt to load the Binary File.
 	proj = angr.Project(file, load_options = {'auto_load_libs':False})
-	cfg = proj.analyses.CFG()
-	print('\nBinary Architecture:') 
+	print('\nBinary Architecture:')
+	#Print out the Binary Architecture.
 	print(proj.arch)
 
 #A function to run radare2 analysis.
