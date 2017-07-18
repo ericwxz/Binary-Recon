@@ -9,10 +9,21 @@
 import os
 import sys
 import angr
+import binwalk
+import r2pipe
 
 #A function to run Binwalk Signature and Entropy Scan.
 def binwalkSigEntropyScan():
-	print ('rawr4')
+	for module in binwalk.scan(file, 
+				   signature=True,  
+				   quiet=True):
+		print "%s Binwalk Signature Scan:" % module.name
+		for result in module.results:
+			print "\t%s    0x%.8x    %s" % (result.file.name, 
+							result.offset,
+							result.description)
+	print "Binwalk Entropy Scan:"
+	binwalk.scan(file, entropy=True)
 
 #A function to run a Netcat Service Heartbeat.
 def netcatHeartBeat(): 
@@ -29,7 +40,40 @@ def halfAngrScan():
 
 #A function to run radare2 analysis.
 def radare2Scan():
-	print ('rawr5')
+	#setup
+	r2 = r2pipe.open(file)
+	r2.cmd("aaa")
+	r2.cmd("s main")
+
+	print "\x1B[32m" + "\n\n\nR2 Analysis:\n" + "\x1B[0m"
+
+	#print basic fileinfo
+	print("\x1B[31m" + "File info: \n" + "\x1B[0m" + r2.cmd('iI~arch,bintype,bits,class,endian,lang,machine,os'))
+	bintype = r2.cmd('iI~bintype')
+	
+	
+	#print entrypoints, main, linked libraries
+	print "\x1B[31m" + "\nBinary info: " + "\x1B[0m"
+	print r2.cmd("ie")
+	print r2.cmd('iM')
+	print "\n" + r2.cmd('il')
+	
+	#ask if user wants to see all functions
+	uinput = raw_input("\nDo you want to see all functions? (y/n)")
+		if uinput == 'y' or uinput == 'Y':
+			print r2.cmd('afl')
+	
+	#ask if user wants to run readelf
+	if 'elf' in bintype:
+		uinput = raw_input("\nDo you want to run readelf -a?(y/n)")
+		if uinput == 'y' or uinput == 'Y':
+			print "\x1B[31m" + "\nReadelf \n" + "\x1B[0m"
+			print r2.cmd("!readelf -a " + file)
+
+	#ask if user wants to run strings
+	uinput = raw_input("\nDo you want to call strings? (y/n)")
+		if uinput == 'y' or uinput == 'Y':
+			print r2.cmd("!strings " + file)
 
 #A help function to explain which flags runs which scan.
 def help():
