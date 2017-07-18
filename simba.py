@@ -36,7 +36,7 @@ def netcatHeartBeat():
 
 	ip = raw_input('Input an IP to run a Netcat Service Heartbeat.\n')
 	try:
-		socket.inet_aton(addr)
+		socket.inet_aton(ip)
 	except: socket.error
 
 	port = raw_input('Input a Port on the IP.\n')
