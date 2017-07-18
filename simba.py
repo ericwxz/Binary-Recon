@@ -31,12 +31,28 @@ def netcatHeartBeat():
 	
 
 #A function to run angr analysis.
-def fullAngrScan():
-	print ('rawr1')
+def fullAngrScan(file):
+	print('\nLoading the Binary...')
+	proj = angr.Project(file, load_options = {'auto_load_libs':False})
+	cfg = proj.analyses.CFG()
+	print('\nBinary Architecture:') 
+	print(proj.arch)
+	print('\nFunction List\n')
+	count = len(cfg.functions.items())
+	i = 0
+	for i in cfg.functions.items():
+		print i	
+	print('\nStack Protection:')
+	print(proj.loader.aslr)
+	print('\n')
 
 #A function to run angr analysis without CFG, Function list, or Stack protection.
-def halfAngrScan():
-	print ('rawr2')
+def halfAngrScan(file):
+	print('\nLoading the Binary...')
+	proj = angr.Project(file, load_options = {'auto_load_libs':False})
+	cfg = proj.analyses.CFG()
+	print('\nBinary Architecture:') 
+	print(proj.arch)
 
 #A function to run radare2 analysis.
 def radare2Scan():
@@ -144,10 +160,10 @@ def main():
 	for i in range(1, len(sys.argv)):
 		#Jump to angr function.
 		if(sys.argv[i] == '-a'):
-			fullAngrScan()
+			fullAngrScan(file)
 		#Jump to simple angr function.
 		elif(sys.argv[i] == '-aB'):
-			halfAngrScan()
+			halfAngrScan(file)
 		#Jump to Netcat service heartbeat.
 		elif(sys.argv[i] == '-n'):
 			netcatHeartBeat()
