@@ -10,7 +10,7 @@ def r2(self, filepath, option):
 	r2.cmd("s main")
 
 
-	print "\x1B[32m" + "\n\n\nUseful stuff to know:\n" + "\x1B[0m"
+	print "\x1B[32m" + "\n\n\nRadare2 Analysis:\n" + "\x1B[0m"
 
 	#print basic fileinfo
 	print("\x1B[31m" + "File info: \n" + "\x1B[0m" + r2.cmd('iI~arch,bintype,bits,class,endian,lang,machine,os'))
