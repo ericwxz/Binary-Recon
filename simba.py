@@ -128,6 +128,7 @@ def main():
 			elif x in binlist:
 				inlist = inlist or True
 		if inlist == False:
+			print('Sorry, if you give a path, you must also supply a flag for a scan')
 			exit()
 	elif((sys.argv[1] != '-n') or (len(argset) > 1)):
 		print('Sorry that is im-proper format. \nTry using the -h flag to fix it')
