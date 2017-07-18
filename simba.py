@@ -70,7 +70,12 @@ def main():
 		print('No arguments given')
 		exit()
 
-	#If the file exists, and the flags given are in the 
+	#If -h flag is anywhere in the argset this forces the help function to be shown.
+	if '-h' in argset:
+		help()
+		exit()
+
+	#Complicated loop. Checks if a file is passed. If it is, it checks the flags and makes sure at least on of the flags requires a binary (from our predetermined list binlist), as long as one of these flags is in the list it runs, otherwise it quits. Also if no file is given it makes sure that only either -n or -h flags are passed.
 	inlist = False
 	if (os.path.exists(file)):
 		for x in argset:
@@ -80,13 +85,10 @@ def main():
 				inlist = inlist or True
 		if inlist == False:
 			exit()
-	elif((sys.argv[1] != '-n') or len(argset) > 1):
+	elif((sys.argv[1] != '-n') or (len(argset) > 1)):
 		print('Sorry that is im-proper format. \nTry using the -h flag to fix it')
 		exit()
 
-	#If -h flag is anywhere in the argset this forces the help function to be shown.
-	if '-h' in argset:
-		help()
 		
 		#For loop to run all the scans based on the flags given in order at 	command line.
 	for i in range(1, len(sys.argv)):
