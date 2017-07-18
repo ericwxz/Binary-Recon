@@ -63,13 +63,18 @@ def radare2Scan():
 		if uinput == 'y' or uinput == 'Y':
 			print r2.cmd('afl')
 	
-	#ask if user wants to run readelf
+	#ask if user wants to run readelf or objdump
 	if 'elf' in bintype:
 		uinput = raw_input("\nDo you want to run readelf -a?(y/n)")
 		if uinput == 'y' or uinput == 'Y':
 			print "\x1B[31m" + "\nReadelf \n" + "\x1B[0m"
 			print r2.cmd("!readelf -a " + file)
 
+	else:
+		uinput = raw_input("\nDo you want to run objdump -h?(y/n)")
+		if uinput == 'y' or uinput == 'Y':
+			print "\x1B[31m" + "\nObjdump -h\n" + "\x1B[0m"
+			print r2.cmd("!objdump -h " + file)
 	#ask if user wants to run strings
 	uinput = raw_input("\nDo you want to call strings? (y/n)")
 		if uinput == 'y' or uinput == 'Y':
