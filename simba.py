@@ -161,7 +161,7 @@ def main():
 			#If x is in binlist or inlist with true, this will set inlist to true.
 			elif x in binlist:
 				inlist = inlist or True
-		#We make it through the for loop and inlist is still true, that means a binary was given but no flags for scans.
+		#We make it through the for loop and inlist is still false, that means a binary was given but no flags for scans.
 		if inlist == False:
 			print('Sorry, if you give a path, you must also supply a flag for a scan')
 			exit()
