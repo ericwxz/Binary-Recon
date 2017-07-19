@@ -9,11 +9,12 @@
 import os
 import sys
 import angr
-import binwalk
 import r2pipe
+import binwalk
 
 #A function to run Binwalk Signature and Entropy Scan.
 def binwalkSigEntropyScan(file):
+	
 	for module in binwalk.scan(file, 
 				   signature=True,  
 				   quiet=True):
@@ -22,9 +23,9 @@ def binwalkSigEntropyScan(file):
 			print "\t%s    0x%.8x    %s" % (result.file.name, 
 							result.offset,
 							result.description)
-	print "Binwalk Entropy Scan:"
+	print "\nBinwalk Entropy Scan:"
 	binwalk.scan(file, entropy=True)
-	print ('rawr')
+	print "\n"
 #A function to run a Netcat Service Heartbeat.
 def netcatHeartBeat(): 
 	print ('rawr3')
