@@ -136,12 +136,8 @@ def fullAngrScan(file):
 	#Show the binary Stack Protection state.
 	fullangrscan = fullangrscan + '\nSTACK PROTECTION:\n'
 	print(proj.loader.aslr)
-<<<<<<< HEAD
 	#Adding the Stack protection to the string
-	fullangrscan = fullangrscan + str(proj.loader.aslr) + '\n'
-=======
 	fullangrscan = fullangrscan + str(proj.loader.aslr) + '\n' + "\n===FULL ANGR ANALYSIS===\n\n"
->>>>>>> 434bd2668023aa80cb808933f788df9c49aebeaa
 	print('\n')
 
 	#return the string for the output file
@@ -157,12 +153,8 @@ def halfAngrScan(file):
 	print('\nBinary Architecture:')
 	#Print out the Binary Architecture.
 	print(proj.arch)
-<<<<<<< HEAD
 	#Adding binary architecture to the string
-	halfangrscan = halfangrscan + '\nARCHITECTURE:\n' + str(proj.arch)
-=======
 	halfangrscan = halfangrscan + '\nARCHITECTURE:\n' + str(proj.arch) + "\n\n\n===Partial ANGR ANALYSIS===\n\n"
->>>>>>> 434bd2668023aa80cb808933f788df9c49aebeaa
 
 	return halfangrscan
 
