@@ -36,18 +36,23 @@ def binwalkSigEntropyScan(file):
 def netcatHeartBeat():
 
 	ip = raw_input('Input an IP to run a Netcat Service Heartbeat.\n')
-	try:
-		socket.inet_aton(ip)
-	except: socket.error
-
 	port = raw_input('Input a Port on the IP.\n')
 	while(not(port.isdigit())):
 		port = raw_input('Input a Port on the IP.\n')
 
+	cmd = 'while `nc -vv -z -w3 '  + ip + ' ' + port + ' > /dev/null`; do echo "OK"; sleep 1; done; echo "DOWN"; while (true); do echo "***DOWN***"; sleep 5; done'	
 
-	cmd = 'while `nc -nn -vv -z -w3 '  + ip + ' ' + port + ' > /dev/null`; do echo "OK"; sleep 1; done; echo "DOWN"; while (true); do echo "***DOWN***"; sleep 5; done'
+	try:
+		os.system(cmd)
+	except: 
+		print("Could not connect to " + ip + " on port " + port)
+		exit(0)
 
-	os.system(cmd)
+
+
+	
+
+	#os.system(cmd)
 
 def cpu_rec(file):
 	
