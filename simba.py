@@ -60,12 +60,18 @@ def cpu_rec(file):
 	found = cpu_recHelper(file, '/home')
 	
 
-	if found == False:
+	if found[0] == '0':
 		print "Sorry, we can't find cpu_rec installed on the system"
+	
+
+	found[1] = "==================CPU_REC==================\n" + found[1]
+	return found[1]
+		
 	
 
 #recursive helper method to determine if cpu_rec is installed on the system and where to call it from
 def cpu_recHelper(file, curdir):
+	ret = ['0','']	
 	found = False
 	for dirname, names, files in os.walk(curdir):
 		for f in files:
@@ -73,19 +79,21 @@ def cpu_recHelper(file, curdir):
 				print "Found cpu_rec.py at %s \n" % os.path.abspath(dirname)
 				if 'modules' in dirname:
 					print "Calling cpu_rec as a binwalk plugin:"
-					subprocess.call('binwalk -% ' + file, shell = True)
+					ret[1] = str(subprocess.call('binwalk -% ' + file, shell = True))
 				else:
 					print "Calling cpu_rec as an independent tool:"
-					subprocess.call('python ' + os.path.abspath(os.path.join(dirname, 'cpu_rec.py'))  + " " + file, shell = True)		
-				found = True		
-				return True
+					ret[1] = str(subprocess.call('python ' + os.path.abspath(os.path.join(dirname, 'cpu_rec.py'))  + " " + file, shell = True))		
+				found = True
+				ret[0] = '1'		
+				return ret
 		if found == False:
 			for name in names:
 				if 'binwalk' not in name:
-					if cpu_recHelper(file, os.path.abspath(os.path.join(dirname, name))) == True:
-						return True
+					arr = cpu_recHelper(file, os.path.abspath(os.path.join(dirname, name)))
+					if not(arr[0] == '0') :
+						return arr
 	
-	return False
+	return ret
 	
 
 #A function to run angr analysis.
