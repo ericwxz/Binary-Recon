@@ -275,6 +275,11 @@ def main():
 		else:
 			print('\nYour output file is not a proper .txt file. Fix that and try again.')
 			exit()
+	elif '-o' not in argset:
+		if '.txt' in sys.argv[argsetlen-1]:
+			print('If you\'re going to try and pass an output file, make sure that -o is one of the flags passed!')
+			exit()
+
 		
 
 	#Complicated loop. Checks if a file is passed. If it is, it checks the flags and makes sure at least on of the flags requires a binary (from our predetermined list binlist), as long as one of these flags is in the list it runs, otherwise it quits. Also if no file is given it makes sure that only either -n or -h flags are passed.
@@ -325,6 +330,5 @@ def main():
 	
 	if out == 1:
 		output(allanalysis,outfile)
-
 
 main()
