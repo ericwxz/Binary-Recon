@@ -2,8 +2,8 @@
 #Revision: 1
 #Authors: Elijah Sheets & Eric Zhang
 #Project Start:7/17/2017
-#Last Revision:7/18/2017
-#Goal: Through collaboration with a fellow NREIP intern build a Binary Reconnaissance 	     Tool to run specific scans and or analysis.
+#Last Edit:7/19/2017
+#Goal: Through collaboration with a fellow NREIP intern build a Binary Reconnaissance Tool to run specific scans and or analysis.
 
 #imports
 import os
@@ -25,7 +25,11 @@ def binwalkSigEntropyScan(file):
 							result.description)
 	print "\nBinwalk Entropy Scan:"
 	binwalk.scan(file, entropy=True)
+
 	print "\n"
+
+
+
 #A function to run a Netcat Service Heartbeat.
 def netcatHeartBeat(): 
 	print ('rawr3')
@@ -34,25 +38,31 @@ def netcatHeartBeat():
 #A function to run angr analysis.
 def fullAngrScan(file):
 	print('\nLoading the Binary...')
+	#Using angr to attempt to load the Binary File.
 	proj = angr.Project(file, load_options = {'auto_load_libs':False})
+	#Running a Control Flow Graph Analysis on the Binary.
 	cfg = proj.analyses.CFG()
 	print('\nBinary Architecture:') 
+	#Print out the Binary Architecture.
 	print(proj.arch)
 	print('\nFunction List\n')
+	#Loop to print out all the function lists on separate lines.
 	count = len(cfg.functions.items())
 	i = 0
 	for i in cfg.functions.items():
 		print i	
 	print('\nStack Protection:')
+	#Show the binary Stack Protection state.
 	print(proj.loader.aslr)
 	print('\n')
 
 #A function to run angr analysis without CFG, Function list, or Stack protection.
 def halfAngrScan(file):
 	print('\nLoading the Binary...')
+	#Using angr to attempt to load the Binary File.
 	proj = angr.Project(file, load_options = {'auto_load_libs':False})
-	cfg = proj.analyses.CFG()
-	print('\nBinary Architecture:') 
+	print('\nBinary Architecture:')
+	#Print out the Binary Architecture.
 	print(proj.arch)
 
 #A function to run radare2 analysis.
@@ -101,6 +111,9 @@ def radare2Scan(filepath):
 def help():
 	print ("\n \'-a\' : To run angr analysis\n \'-aB\' : To run angr analysis(no CFG, function list, stack protection\n \'-b\' : To run binwalk signature and entropy scan\n \'-n\' : To run netcat service heartbeat\n \'-r\' : To run radare2 analysis\n \'-h\' : To get the help table (this table)\n")
 
+	print ("Synopsis:\n")
+	print ("python simba.py [Binary File*] [Flag1] [Flag2*] [Flag...*]\n")
+	print ("\'*\' means it is optional.\nIt should be noted that this program will not run if:\n    1. A binary file is given but no scan flags.\n    2. A scan flag is given but no binary file.\n    3. No arguments are passed to the too.l\n    4. A file that does not exist is passed to the tool.\n    5. A flag that is not apart of this tools library is passed to it.\n")
 
 
 
@@ -117,6 +130,7 @@ def main():
 
 	#Generate a set of all possible flags for this tool.
 	fullargset = set(['-a','-aB','-b','-n','-r','-h'])
+	#A set of all the flags that require a binary file to scan.
 	binlist = ['-a','-aB','-b','-r']
 	#Initialize a set of to contain all the flags passed in the command line.
 	argset = set([])
@@ -144,14 +158,19 @@ def main():
 	#Complicated loop. Checks if a file is passed. If it is, it checks the flags and makes sure at least on of the flags requires a binary (from our predetermined list binlist), as long as one of these flags is in the list it runs, otherwise it quits. Also if no file is given it makes sure that only either -n or -h flags are passed.
 	inlist = False
 	if (os.path.exists(file)):
+		#Each element in argset
 		for x in argset:
+			#If x is not in the binlist inlist with False (If inlist is already true this does nothing, but if its false it stays false).
 			if x not in binlist:
 				inlist = inlist or False
+			#If x is in binlist or inlist with true, this will set inlist to true.
 			elif x in binlist:
 				inlist = inlist or True
+		#We make it through the for loop and inlist is still false, that means a binary was given but no flags for scans.
 		if inlist == False:
 			print('Sorry, if you give a path, you must also supply a flag for a scan')
 			exit()
+	#Check that if only one argument is given it MUST be -n
 	elif((sys.argv[1] != '-n') or (len(argset) > 1)):
 		print('Sorry that is im-proper format. \nTry using the -h flag to fix it')
 		exit()
