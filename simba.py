@@ -111,6 +111,7 @@ def cpu_recHelper(file, curdir):
 
 #A function to run angr analysis.
 def fullAngrScan(file):
+	#File Header File
 	fullangrscan = '\n\n\n==================FULL ANGR ANALYSIS==================\n\n\n'
 	print('\nLoading the Binary...')
 	#Using angr to attempt to load the Binary File.
@@ -120,6 +121,7 @@ def fullAngrScan(file):
 	print('\nBinary Architecture:') 
 	#Print out the Binary Architecture.
 	print(proj.arch)
+	#Adding binary architecture to the string
 	fullangrscan = fullangrscan + '\nARCHITECTURE:\n' + str(proj.arch)
 	print('\nFunction List\n')
 	#Loop to print out all the function lists on separate lines.
@@ -128,18 +130,22 @@ def fullAngrScan(file):
 	fullangrscan = fullangrscan + '\n\nFUNCTION LISTS:\n'
 	for i in cfg.functions.items():
 		print i
+		#Adding each function to the string
 		fullangrscan = fullangrscan + str(i) + '\n'
 	print('\nStack Protection:')
 	#Show the binary Stack Protection state.
 	fullangrscan = fullangrscan + '\nSTACK PROTECTION:\n'
 	print(proj.loader.aslr)
+	#Adding the Stack protection to the string
 	fullangrscan = fullangrscan + str(proj.loader.aslr) + '\n'
 	print('\n')
 
+	#return the string for the output file
 	return fullangrscan
 
 #A function to run angr analysis without CFG, Function list, or Stack protection.
 def halfAngrScan(file):
+	#File Header Title
 	halfangrscan = '\n\n\n==================Partial ANGR ANALYSIS==================\n\n\n'
 	print('\nLoading the Binary...')
 	#Using angr to attempt to load the Binary File.
@@ -147,6 +153,7 @@ def halfAngrScan(file):
 	print('\nBinary Architecture:')
 	#Print out the Binary Architecture.
 	print(proj.arch)
+	#Adding binary architecture to the string
 	halfangrscan = halfangrscan + '\nARCHITECTURE:\n' + str(proj.arch)
 
 	return halfangrscan
@@ -210,15 +217,18 @@ def radare2Scan(filepath):
 
 #A help function to explain which flags runs which scan.
 def help():
-	print ("\n \'-a\' : To run angr analysis\n \'-aB\' : To run angr analysis(no CFG, function list, stack protection\n \'-b\' : To run binwalk signature and entropy scan\n \'-n\' : To run netcat service heartbeat\n \'-r\' : To run radare2 analysis\n \'-o\' : To tell the tool to output the scan information to a file\n\ '-h\' : To get the help table (this table)\n")
+	print ("\n \'-a\' : To run angr analysis\n \'-aB\' : To run angr analysis(no CFG, function list, stack protection\n \'-b\' : To run binwalk signature and entropy scan\n \'-n\' : To run netcat service heartbeat\n \'-r\' : To run radare2 analysis\n \'-o\' : To tell the tool to output the scan information to a file\n \'-h\' : To get the help table (this table)\n")
 
 	print ("Synopsis:\n")
 	print ("python simba.py [Binary File*] [Flag1] [Flag2*] [Flag...*] [Output File*]\n")
 	print ("\'*\' means it is optional.\nIt should be noted that this program will not run if:\n    1. A binary file is given but no scan flags.\n    2. A scan flag is given but no binary file.\n    3. No arguments are passed to the too.l\n    4. A file that does not exist is passed to the tool.\n    5. A flag that is not apart of this tools library is passed to it.\n")
 
 def output(allanalysis,outfile):
+	#Open the file in overwrite mode
 	f = open(outfile, "w+")
+	#Write all analysis information to the file
 	f.write(allanalysis)
+	#close the file
 	f.close()
 
 
@@ -245,6 +255,7 @@ def main():
 
 	#Grab all arguments given at command line and put them into the argset.
 	while(j < argsetlen):
+		#Check if the argument is the output file.
 		if '.txt' not in sys.argv[j]:
 			argset.add(sys.argv[j])
 			j = j+1
@@ -267,6 +278,7 @@ def main():
 		help()
 		exit()
 
+	#Set the output file location and check that it is a proper file.
 	if '-o' in argset:
 		outfile1 = sys.argv[(argsetlen-1)]
 		if '.txt' in outfile1:
@@ -275,6 +287,7 @@ def main():
 		else:
 			print('\nYour output file is not a proper .txt file. Fix that and try again.')
 			exit()
+	#Make sure no output is passed without a -o flag as well.
 	elif '-o' not in argset:
 		if '.txt' in sys.argv[argsetlen-1]:
 			print('If you\'re going to try and pass an output file, make sure that -o is one of the flags passed!')
@@ -322,6 +335,7 @@ def main():
 			allanalysis = allanalysis + '\n' + radare2Scan(file)
 		elif(sys.argv[i] == '-c'):
 			cpu_rec(file)
+		#Increment a variable so we know if we are going to output to a file after the loop completes.
 		elif(sys.argv[i] == '-o'):
 			out = out +1
 		#If the argument is -h, just continue the for loop.
