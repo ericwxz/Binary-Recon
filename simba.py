@@ -182,10 +182,10 @@ def radare2Scan(filepath):
 
 #A help function to explain which flags runs which scan.
 def help():
-	print ("\n \'-a\' : To run angr analysis\n \'-aB\' : To run angr analysis(no CFG, function list, stack protection\n \'-b\' : To run binwalk signature and entropy scan\n \'-n\' : To run netcat service heartbeat\n \'-r\' : To run radare2 analysis\n \'-h\' : To get the help table (this table)\n")
+	print ("\n \'-a\' : To run angr analysis\n \'-aB\' : To run angr analysis(no CFG, function list, stack protection\n \'-b\' : To run binwalk signature and entropy scan\n \'-n\' : To run netcat service heartbeat\n \'-r\' : To run radare2 analysis\n \'-o\' : To tell the tool to output the scan information to a file\n\ '-h\' : To get the help table (this table)\n")
 
 	print ("Synopsis:\n")
-	print ("python simba.py [Binary File*] [Flag1] [Flag2*] [Flag...*]\n")
+	print ("python simba.py [Binary File*] [Flag1] [Flag2*] [Flag...*] [Output File*]\n")
 	print ("\'*\' means it is optional.\nIt should be noted that this program will not run if:\n    1. A binary file is given but no scan flags.\n    2. A scan flag is given but no binary file.\n    3. No arguments are passed to the too.l\n    4. A file that does not exist is passed to the tool.\n    5. A flag that is not apart of this tools library is passed to it.\n")
 
 def output(allanalysis,outfile):
@@ -244,6 +244,9 @@ def main():
 		if '.txt' in outfile1:
 			argsetlen = argsetlen-1
 			outfile = outfile1
+		else:
+			print('\nYour output file is not a proper .txt file. Fix that and try again.')
+			exit()
 		
 
 	#Complicated loop. Checks if a file is passed. If it is, it checks the flags and makes sure at least on of the flags requires a binary (from our predetermined list binlist), as long as one of these flags is in the list it runs, otherwise it quits. Also if no file is given it makes sure that only either -n or -h flags are passed.
