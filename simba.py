@@ -40,7 +40,7 @@ def binwalkSigEntropyScan(file):
 	
 
 	print "\n"
-	output += "\n\n\n"
+	output += "\n\n\n ===BINWALK=== \n\n\n"
 	return output
 
 
@@ -77,7 +77,7 @@ def cpu_rec(file):
 		print "Sorry, we can't find cpu_rec installed on the system"
 	
 
-	found[1] = "==================CPU_REC==================\n" + found[1]
+	found[1] = "==================CPU_REC==================\n" + found[1] + "\n\n ===CPU_REC===\n\n"
 	return found[1]
 		
 	
@@ -136,8 +136,12 @@ def fullAngrScan(file):
 	#Show the binary Stack Protection state.
 	fullangrscan = fullangrscan + '\nSTACK PROTECTION:\n'
 	print(proj.loader.aslr)
+<<<<<<< HEAD
 	#Adding the Stack protection to the string
 	fullangrscan = fullangrscan + str(proj.loader.aslr) + '\n'
+=======
+	fullangrscan = fullangrscan + str(proj.loader.aslr) + '\n' + "\n===FULL ANGR ANALYSIS===\n\n"
+>>>>>>> 434bd2668023aa80cb808933f788df9c49aebeaa
 	print('\n')
 
 	#return the string for the output file
@@ -153,8 +157,12 @@ def halfAngrScan(file):
 	print('\nBinary Architecture:')
 	#Print out the Binary Architecture.
 	print(proj.arch)
+<<<<<<< HEAD
 	#Adding binary architecture to the string
 	halfangrscan = halfangrscan + '\nARCHITECTURE:\n' + str(proj.arch)
+=======
+	halfangrscan = halfangrscan + '\nARCHITECTURE:\n' + str(proj.arch) + "\n\n\n===Partial ANGR ANALYSIS===\n\n"
+>>>>>>> 434bd2668023aa80cb808933f788df9c49aebeaa
 
 	return halfangrscan
 
@@ -212,7 +220,7 @@ def radare2Scan(filepath):
 	uinput = raw_input("\nDo you want to see all strings? (y/n)")
 	if uinput == 'y' or uinput == 'Y':
 		print r2.cmd("!strings " + filepath)
-	output += "STRINGS: \n\n" + r2.cmd("!strings " + filepath)
+	output += "STRINGS: \n\n" + r2.cmd("!strings " + filepath) + "\n\n\n===RADARE2===\n\n"
 	return output
 
 #A help function to explain which flags runs which scan.
