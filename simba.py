@@ -117,9 +117,9 @@ def radare2Scan(filepath):
 			print "\x1B[31m" + "\nObjdump -h\n" + "\x1B[0m"
 			print r2.cmd("!objdump -h " + filepath)
 	#ask if user wants to run strings
-	uinput = raw_input("\nDo you want to call strings? (y/n)")
+	uinput = raw_input("\nDo you want to see all strings? (y/n)")
 	if uinput == 'y' or uinput == 'Y':
-		print r2.cmd("!strings " + filepath)
+		print r2.cmd("ps")
 
 #A help function to explain which flags runs which scan.
 def help():
