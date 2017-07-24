@@ -119,7 +119,7 @@ def radare2Scan(filepath):
 	#ask if user wants to run strings
 	uinput = raw_input("\nDo you want to see all strings? (y/n)")
 	if uinput == 'y' or uinput == 'Y':
-		print r2.cmd("ps")
+		print r2.cmd("!strings " + filepath)
 
 #A help function to explain which flags runs which scan.
 def help():
