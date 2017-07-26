@@ -12,6 +12,7 @@ import angr
 import r2pipe
 import binwalk
 import socket
+import subprocess
 
 #A function to run Binwalk Signature and Entropy Scan.
 def binwalkSigEntropyScan(file):
@@ -19,7 +20,7 @@ def binwalkSigEntropyScan(file):
 	for module in binwalk.scan(file, 
 				   signature=True,  
 				   quiet=True):
-		print "%s Binwalk Signature Scan:" % module.name
+		print "Binwalk Signature Scan:"
 		for result in module.results:
 			print "\t%s    0x%.8x    %s" % (result.file.name, 
 							result.offset,
@@ -47,6 +48,39 @@ def netcatHeartBeat():
 	cmd = 'while `nc -nn -vv -z -w3 '  + ip + ' ' + port + ' > /dev/null`; do echo "OK"; sleep 1; done; echo "DOWN"; while (true); do echo "***DOWN***"; sleep 5; done'
 
 	os.system(cmd)
+
+def cpu_rec(file):
+	
+	print "Warning: finding cpu_rec may take a while, and running it might take longer"
+	found = cpu_recHelper(file, '/home')
+	
+
+	if found == False:
+		print "Sorry, we can't find cpu_rec installed on the system"
+	
+
+#recursive helper method to determine if cpu_rec is installed on the system and where to call it from
+def cpu_recHelper(file, curdir):
+	found = False
+	for dirname, names, files in os.walk(curdir):
+		for f in files:
+			if f == 'cpu_rec.py':
+				print "Found cpu_rec.py at %s \n" % os.path.abspath(dirname)
+				if 'modules' in dirname:
+					print "Calling cpu_rec as a binwalk plugin:"
+					subprocess.call('binwalk -% ' + file, shell = True)
+				else:
+					print "Calling cpu_rec as an independent tool:"
+					subprocess.call('python ' + os.path.abspath(os.path.join(dirname, 'cpu_rec.py'))  + " " + file, shell = True)		
+				found = True		
+				return True
+		if found == False:
+			for name in names:
+				if 'binwalk' not in name:
+					if cpu_recHelper(file, os.path.abspath(os.path.join(dirname, name))) == True:
+						return True
+	
+	return False
 	
 
 #A function to run angr analysis.
@@ -143,9 +177,9 @@ def main():
 		j=1
 
 	#Generate a set of all possible flags for this tool.
-	fullargset = set(['-a','-aB','-b','-n','-r','-h'])
+	fullargset = set(['-a','-aB','-b','-n','-r', '-c','-h'])
 	#A set of all the flags that require a binary file to scan.
-	binlist = ['-a','-aB','-b','-r']
+	binlist = ['-a','-aB','-b','-r', '-c']
 	#Initialize a set of to contain all the flags passed in the command line.
 	argset = set([])
 
@@ -207,6 +241,8 @@ def main():
 		#Jump to radare2 Scan.
 		elif(sys.argv[i] == '-r'):
 			radare2Scan(file)
+		elif(sys.argv[i] == '-c'):
+			cpu_rec(file)
 		#If the argument is -h, just continue the for loop.
 		elif(sys.argv[i] == '-h'):
 			continue
