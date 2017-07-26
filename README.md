@@ -4,7 +4,7 @@ Load like any other python script, and pass arguments to run preliminary analysi
 
 Example:
 
-`$ python simba.py ~/Downloads/shady.bin -a -n -b -r -aB`
+`$ python simba.py ~/Downloads/shady.bin -aB -b -r`
 
 ## Parameters
 
@@ -18,6 +18,8 @@ Add -n to run a netcat service heartbeat
 
 Add -r to run a radare2 analysis
 
+Add -c to run a cpu_rec analysis
+
 Add -h to repeat this information
 
 ## Requirements
@@ -26,4 +28,4 @@ Requires all analysis tools to already be installed and accessible to the user r
 
 R2pipe can be installed with `$ pip install r2pipe`
 
-
+cpu_rec is not necessary to run the tool.
