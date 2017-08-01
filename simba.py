@@ -267,7 +267,7 @@ def output(allanalysis,outfile):
 					n+=1
 				f.write(">\n")
 				n+=5 #skip trailing @ signs
-			#check scan output for special xml characters and replace them		
+			#check scan output for special or problematic xml characters and replace them		
 			else: 
 				if allanalysis[n] == "\n":
 					f.write(allanalysis[n] + "\t")
@@ -277,10 +277,12 @@ def output(allanalysis,outfile):
 					f.write("&gt;")
 				elif allanalysis[n] == "&":
 					f.write("&amp;")
-				elif allanalysis[n] == "\'":
+				elif allanalysis[n] == '\'':
 					f.write("&apos;")
-				elif allanalysis[n]=="\"":
+				elif allanalysis[n]=='\"':
 					f.write("&quot;")
+				elif allanalysis[n]=='\n':
+					f.write("&#xA;")
 				else:
 					f.write(allanalysis[n])
 				n+=1
