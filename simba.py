@@ -40,7 +40,7 @@ def binwalkSigEntropyScan(file):
 	
 
 	print "\n"
-	output += "\n\n\n ===BINWALK=== \n\n\n"
+	output += "\n\n\n @@@@@BINWALK@@@@@ \n\n\n"
 	return output
 
 
@@ -77,7 +77,7 @@ def cpu_rec(file):
 		print "Sorry, we can't find cpu_rec installed on the system"
 	
 
-	found[1] = "==================CPU_REC==================\n" + found[1] + "\n\n ===CPU_REC===\n\n"
+	found[1] = "==================CPU_REC==================\n" + found[1] + "\n\n @@@@@CPU_REC@@@@@\n\n"
 	return found[1]
 		
 	
@@ -137,7 +137,7 @@ def fullAngrScan(file):
 	fullangrscan = fullangrscan + '\nSTACK PROTECTION:\n'
 	print(proj.loader.aslr)
 	#Adding the Stack protection to the string
-	fullangrscan = fullangrscan + str(proj.loader.aslr) + '\n' + "\n===FULL ANGR ANALYSIS===\n\n"
+	fullangrscan = fullangrscan + str(proj.loader.aslr) + '\n' + "\n@@@@@FULL ANGR ANALYSIS@@@@@\n\n"
 	print('\n')
 
 	#return the string for the output file
@@ -154,7 +154,7 @@ def halfAngrScan(file):
 	#Print out the Binary Architecture.
 	print(proj.arch)
 	#Adding binary architecture to the string
-	halfangrscan = halfangrscan + '\nARCHITECTURE:\n' + str(proj.arch) + "\n\n\n===Partial ANGR ANALYSIS===\n\n"
+	halfangrscan = halfangrscan + '\nARCHITECTURE:\n' + str(proj.arch) + "\n\n\n@@@@@Partial ANGR ANALYSIS@@@@@\n\n"
 
 	return halfangrscan
 
@@ -212,7 +212,7 @@ def radare2Scan(filepath):
 	uinput = raw_input("\nDo you want to see all strings? (y/n)")
 	if uinput == 'y' or uinput == 'Y':
 		print r2.cmd("!strings " + filepath)
-	output += "STRINGS: \n\n" + r2.cmd("!strings " + filepath) + "\n\n\n===RADARE2===\n\n"
+	output += "STRINGS: \n\n" + r2.cmd("!strings " + filepath) + "\n\n\n@@@@@RADARE2@@@@@\n\n"
 	return output
 
 #A help function to explain which flags runs which scan.
@@ -224,12 +224,59 @@ def help():
 	print ("\'*\' means it is optional.\nIt should be noted that this program will not run if:\n    1. A binary file is given but no scan flags.\n    2. A scan flag is given but no binary file.\n    3. No arguments are passed to the too.l\n    4. A file that does not exist is passed to the tool.\n    5. A flag that is not apart of this tools library is passed to it.\n")
 
 def output(allanalysis,outfile):
-	#Open the file in overwrite mode
-	f = open(outfile, "w+")
-	#Write all analysis information to the file
-	f.write(allanalysis)
-	#close the file
-	f.close()
+	if ".txt" in outfile:
+		#Open the file in overwrite mode
+		f = open(outfile, "w+")
+		#Write all analysis information to the file
+		f.write(allanalysis)
+		#close the file
+		f.close()
+	elif ".xml" in outfile:
+		#open file in overwrite mode
+		f = open(outfile, "w+")
+		#write xml prolog
+		f.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<executedanalyses>")
+		n = 0;
+		#scan through the text for any analysis headers or footers and write an xml tag in the file instead
+		while n < len(allanalysis):
+			if allanalysis[n:n+18] == "==================": # header tag
+				f.write("\n\t<")
+				n+=18
+				while not allanalysis[n]== "=":
+					if not allanalysis[n] == " ":
+						f.write(allanalysis[n])
+					n+=1
+				f.write(">\n")
+				n+=18
+			if allanalysis[n:n+5] == "@@@@@": #footer tag
+				f.write("\n\t</")
+				n+=5
+				while not allanalysis[n]== "@":
+					if not allanalysis[n] == " ":
+						f.write(allanalysis[n])
+					n+=1
+				f.write(">\n")
+				n+=5
+			#check scan output for special xml characters and replace them		
+			else: 
+				if allanalysis[n] == "\n":
+					f.write(allanalysis[n] + "\t")
+				elif allanalysis[n] == "<":
+					f.write("&lt;")
+				elif allanalysis[n] == ">":
+					f.write("&gt;")
+				elif allanalysis[n] == "&":
+					f.write("&amp;")
+				elif allanalysis[n] == "\'":
+					f.write("&apos;")
+				elif allanalysis[n]=="\"":
+					f.write("&quot;")
+				else:
+					f.write(allanalysis[n])
+				n+=1
+		f.write("\n</executedanalyses>")
+		f.close()
+					
 
 
 
@@ -256,7 +303,7 @@ def main():
 	#Grab all arguments given at command line and put them into the argset.
 	while(j < argsetlen):
 		#Check if the argument is the output file.
-		if '.txt' not in sys.argv[j]:
+		if ('.txt' not in sys.argv[j]) and ('.xml' not in sys.argv[j]):
 			argset.add(sys.argv[j])
 			j = j+1
 		else:
@@ -281,15 +328,15 @@ def main():
 	#Set the output file location and check that it is a proper file.
 	if '-o' in argset:
 		outfile1 = sys.argv[(argsetlen-1)]
-		if '.txt' in outfile1:
+		if '.txt' in outfile1 or '.xml' in outfile1:
 			argsetlen = argsetlen-1
 			outfile = outfile1
 		else:
-			print('\nYour output file is not a proper .txt file. Fix that and try again.')
+			print('\nYour output file is not a proper .txt or .xml file. Fix that and try again.')
 			exit()
 	#Make sure no output is passed without a -o flag as well.
 	elif '-o' not in argset:
-		if '.txt' in sys.argv[argsetlen-1]:
+		if '.txt' in sys.argv[argsetlen-1] or '.xml' in sys.argv[argsetlen-1]:
 			print('If you\'re going to try and pass an output file, make sure that -o is one of the flags passed!')
 			exit()
 
