@@ -16,7 +16,7 @@ import subprocess
 
 #A function to run Binwalk Signature and Entropy Scan.
 def binwalkSigEntropyScan(file):
-	output = "==================BINWALK=================="
+	output = "\n\n\n==================BINWALK==================\n\n\n"
 	for module in binwalk.scan(file, 
 				   signature=True,  
 				   quiet=True):
@@ -111,7 +111,7 @@ def cpu_recHelper(file, curdir):
 
 #A function to run angr analysis.
 def fullAngrScan(file):
-	fullangrscan = '\n\n\nFULL ANGR ANALYSIS\n\n\n'
+	fullangrscan = '\n\n\n==================FULL ANGR ANALYSIS==================\n\n\n'
 	print('\nLoading the Binary...')
 	#Using angr to attempt to load the Binary File.
 	proj = angr.Project(file, load_options = {'auto_load_libs':False})
@@ -140,7 +140,7 @@ def fullAngrScan(file):
 
 #A function to run angr analysis without CFG, Function list, or Stack protection.
 def halfAngrScan(file):
-	halfangrscan = '\n\n\nPartial ANGR ANALYSIS\n\n\n'
+	halfangrscan = '\n\n\n==================Partial ANGR ANALYSIS==================\n\n\n'
 	print('\nLoading the Binary...')
 	#Using angr to attempt to load the Binary File.
 	proj = angr.Project(file, load_options = {'auto_load_libs':False})
@@ -159,7 +159,7 @@ def radare2Scan(filepath):
 	r2.cmd("s main")
 
 	print "\x1B[32m" + "\n\n\nR2 Analysis:\n" + "\x1B[0m"
-	output = '==================RADARE2=================='
+	output = '\n\n\n==================RADARE2==================\n\n\n'
 
 	#print basic fileinfo
 	print("\x1B[31m" + "File info: \n" + "\x1B[0m" + r2.cmd('iI~arch,bintype,bits,class,endian,lang,machine,os'))
