@@ -16,19 +16,32 @@ import subprocess
 
 #A function to run Binwalk Signature and Entropy Scan.
 def binwalkSigEntropyScan(file):
-	
+	output = "==================BINWALK=================="
 	for module in binwalk.scan(file, 
 				   signature=True,  
 				   quiet=True):
 		print "Binwalk Signature Scan:"
+		output+="Binwalk Signature Scan:"
 		for result in module.results:
 			print "\t%s    0x%.8x    %s" % (result.file.name, 
 							result.offset,
 							result.description)
-	print "\nBinwalk Entropy Scan:"
-	binwalk.scan(file, entropy=True)
+			output += "\n%s    0x%.8x    %s" % (result.file.name, 
+							result.offset,
+							result.description)
+	print "\n\n\nBinwalk Entropy Scan:"
+	output += "\nBinwalk Entropy Scan:"
+
+	for module in binwalk.scan(file, entropy=True):
+		for result in module.results:
+			output += "\n%s    0x%.8x    %s" % (result.file.name, 
+							result.offset,
+							result.description)
+	
 
 	print "\n"
+	output += "\n\n\n"
+	return output
 
 
 
@@ -90,33 +103,46 @@ def cpu_recHelper(file, curdir):
 
 #A function to run angr analysis.
 def fullAngrScan(file):
+	output = "==================ANGR=================="
 	print('\nLoading the Binary...')
 	#Using angr to attempt to load the Binary File.
 	proj = angr.Project(file, load_options = {'auto_load_libs':False})
 	#Running a Control Flow Graph Analysis on the Binary.
 	cfg = proj.analyses.CFG()
 	print('\nBinary Architecture:') 
+	output+= '\n\nBinary Architecture:'
 	#Print out the Binary Architecture.
 	print(proj.arch)
+	output += "\n" + str(proj.arch)
 	print('\nFunction List\n')
+	output += '\n\n\nFunction List\n\n'
 	#Loop to print out all the function lists on separate lines.
 	count = len(cfg.functions.items())
 	i = 0
 	for i in cfg.functions.items():
 		print i	
+		output += "\n" + str(i)
 	print('\nStack Protection:')
+	output+="\nStack Protection:"
 	#Show the binary Stack Protection state.
 	print(proj.loader.aslr)
+	output+= "\n\n" + str(proj.loader.aslr)
 	print('\n')
+	output+= "\n\n\n"
+	return output
 
 #A function to run angr analysis without CFG, Function list, or Stack protection.
 def halfAngrScan(file):
+	output = "==================HALFANGR=================="
 	print('\nLoading the Binary...')
 	#Using angr to attempt to load the Binary File.
 	proj = angr.Project(file, load_options = {'auto_load_libs':False})
 	print('\nBinary Architecture:')
+	output += '\nBinary Architecture:'
 	#Print out the Binary Architecture.
 	print(proj.arch)
+	output += str(proj.arch)
+	return output
 
 #A function to run radare2 analysis.
 def radare2Scan(filepath):
@@ -126,9 +152,14 @@ def radare2Scan(filepath):
 	r2.cmd("s main")
 
 	print "\x1B[32m" + "\n\n\nR2 Analysis:\n" + "\x1B[0m"
+	output = '==================RADARE2=================='
 
 	#print basic fileinfo
 	print("\x1B[31m" + "File info: \n" + "\x1B[0m" + r2.cmd('iI~arch,bintype,bits,class,endian,lang,machine,os'))
+	output += "\n\n File info: \n"
+	fileinfo = r2.cmd('iI~arch,bintype,bits,class,endian,lang,machine,os')
+	fileinfo.replace('\t', '\n')
+	output += fileinfo
 	bintype = r2.cmd('iI~bintype')
 	
 	
@@ -137,11 +168,17 @@ def radare2Scan(filepath):
 	print r2.cmd("ie")
 	print r2.cmd('iM')
 	print "\n" + r2.cmd('il')
+
+	output += "\n\n Binary info: \n"
+	output += r2.cmd('ie') + "\n"
+	output += r2.cmd('iM') + "\n"
+	output += r2.cmd('il') + "\n\n"
 	
 	#ask if user wants to see all functions
 	uinput = raw_input("\nDo you want to see all functions? (y/n)")
 	if uinput == 'y' or uinput == 'Y':
 		print r2.cmd('afl')
+	output += "FUNCTIONS: \n\n" + r2.cmd('afl')
 	
 	#ask if user wants to run readelf or objdump
 	if 'elf' in bintype:
@@ -149,16 +186,20 @@ def radare2Scan(filepath):
 		if uinput == 'y' or uinput == 'Y':
 			print "\x1B[31m" + "\nReadelf \n" + "\x1B[0m"
 			print r2.cmd("!readelf -a " + filepath)
+		output += "READELF: \n\n" + r2.cmd("!readelf -a " + filepath)
 
 	else:
 		uinput = raw_input("\nDo you want to run objdump -h?(y/n)")
 		if uinput == 'y' or uinput == 'Y':
 			print "\x1B[31m" + "\nObjdump -h\n" + "\x1B[0m"
 			print r2.cmd("!objdump -h " + filepath)
+		output += "OBJDUMP: \n\n" + r2.cmd("!objdump -h " + filepath)
 	#ask if user wants to run strings
 	uinput = raw_input("\nDo you want to see all strings? (y/n)")
 	if uinput == 'y' or uinput == 'Y':
 		print r2.cmd("!strings " + filepath)
+	output += "STRINGS: \n\n" + r2.cmd("!strings " + filepath)
+	return output
 
 #A help function to explain which flags runs which scan.
 def help():
