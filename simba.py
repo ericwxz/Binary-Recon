@@ -17,11 +17,13 @@ import subprocess
 #A function to run Binwalk Signature and Entropy Scan.
 def binwalkSigEntropyScan(file):
 	output = "\n\n\n==================BINWALK==================\n\n\n"
+	#run binwalk signature scan
 	for module in binwalk.scan(file, 
 				   signature=True,  
 				   quiet=True):
 		print "Binwalk Signature Scan:"
 		output+="Binwalk Signature Scan:"
+		#print and add results of scan to output string
 		for result in module.results:
 			print "\t%s    0x%.8x    %s" % (result.file.name, 
 							result.offset,
@@ -31,9 +33,11 @@ def binwalkSigEntropyScan(file):
 							result.description)
 	print "\n\n\nBinwalk Entropy Scan:"
 	output += "\nBinwalk Entropy Scan:"
-
+	
+	#run binwalk entropy scan, prints and shows graph if possible
 	for module in binwalk.scan(file, entropy=True):
 		for result in module.results:
+			#add results of scan to output string
 			output += "\n%s    0x%.8x    %s" % (result.file.name, 
 							result.offset,
 							result.description)
@@ -84,6 +88,7 @@ def cpu_rec(file):
 
 #recursive helper method to determine if cpu_rec is installed on the system and where to call it from
 def cpu_recHelper(file, curdir):
+	#array of strings returned each time: first index represents whether another call has found it, second index is the output string updated if cpu_rec is found
 	ret = ['0','']	
 	found = False
 	for dirname, names, files in os.walk(curdir):
@@ -171,6 +176,7 @@ def radare2Scan(filepath):
 	#print basic fileinfo
 	print("\x1B[31m" + "File info: \n" + "\x1B[0m" + r2.cmd('iI~arch,bintype,bits,class,endian,lang,machine,os'))
 	output += "\n\n File info: \n"
+	#get fileinfo into output string
 	fileinfo = r2.cmd('iI~arch,bintype,bits,class,endian,lang,machine,os')
 	fileinfo.replace('\t', '\n')
 	output += fileinfo
@@ -182,7 +188,7 @@ def radare2Scan(filepath):
 	print r2.cmd("ie")
 	print r2.cmd('iM')
 	print "\n" + r2.cmd('il')
-
+	#add info to output string
 	output += "\n\n Binary info: \n"
 	output += r2.cmd('ie') + "\n"
 	output += r2.cmd('iM') + "\n"
@@ -192,6 +198,7 @@ def radare2Scan(filepath):
 	uinput = raw_input("\nDo you want to see all functions? (y/n)")
 	if uinput == 'y' or uinput == 'Y':
 		print r2.cmd('afl')
+	#add functions to output string
 	output += "FUNCTIONS: \n\n" + r2.cmd('afl')
 	
 	#ask if user wants to run readelf or objdump
@@ -200,6 +207,7 @@ def radare2Scan(filepath):
 		if uinput == 'y' or uinput == 'Y':
 			print "\x1B[31m" + "\nReadelf \n" + "\x1B[0m"
 			print r2.cmd("!readelf -a " + filepath)
+		#add readelf to output string
 		output += "READELF: \n\n" + r2.cmd("!readelf -a " + filepath)
 
 	else:
@@ -207,11 +215,13 @@ def radare2Scan(filepath):
 		if uinput == 'y' or uinput == 'Y':
 			print "\x1B[31m" + "\nObjdump -h\n" + "\x1B[0m"
 			print r2.cmd("!objdump -h " + filepath)
+		#add objdump to output string
 		output += "OBJDUMP: \n\n" + r2.cmd("!objdump -h " + filepath)
 	#ask if user wants to run strings
 	uinput = raw_input("\nDo you want to see all strings? (y/n)")
 	if uinput == 'y' or uinput == 'Y':
 		print r2.cmd("!strings " + filepath)
+	#add strings to output string
 	output += "STRINGS: \n\n" + r2.cmd("!strings " + filepath) + "\n\n\n@@@@@RADARE2@@@@@\n\n"
 	return output
 
@@ -241,22 +251,22 @@ def output(allanalysis,outfile):
 		while n < len(allanalysis):
 			if allanalysis[n:n+18] == "==================": # header tag
 				f.write("\n\t<")
-				n+=18
-				while not allanalysis[n]== "=":
+				n+=18 #skip past equal signs to text
+				while not allanalysis[n]== "=": #print content of header excluding spaces
 					if not allanalysis[n] == " ":
 						f.write(allanalysis[n])
 					n+=1
 				f.write(">\n")
-				n+=18
+				n+=18 #skip trailing equal signs
 			if allanalysis[n:n+5] == "@@@@@": #footer tag
 				f.write("\n\t</")
-				n+=5
-				while not allanalysis[n]== "@":
+				n+=5  #skip past @ signs to text
+				while not allanalysis[n]== "@": #print content of footer excluding spaces
 					if not allanalysis[n] == " ":
 						f.write(allanalysis[n])
 					n+=1
 				f.write(">\n")
-				n+=5
+				n+=5 #skip trailing @ signs
 			#check scan output for special xml characters and replace them		
 			else: 
 				if allanalysis[n] == "\n":
