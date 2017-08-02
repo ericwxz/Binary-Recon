@@ -16,7 +16,7 @@ import subprocess
 
 #A function to run Binwalk Signature and Entropy Scan.
 def binwalkSigEntropyScan(file):
-	output = "\n\n\n==================BINWALK==================\n\n\n"
+	output = "\n\n\n==================BINWALK==================\n\n\n" #header for txt and xml
 	#run binwalk signature scan
 	for module in binwalk.scan(file, 
 				   signature=True,  
@@ -44,7 +44,7 @@ def binwalkSigEntropyScan(file):
 	
 
 	print "\n"
-	output += "\n\n\n @@@@@BINWALK@@@@@ \n\n\n"
+	output += "\n\n\n @@@@@BINWALK@@@@@ \n\n\n" #footer for txt and xml
 	return output
 
 
@@ -80,7 +80,7 @@ def cpu_rec(file):
 	if found[0] == '0':
 		print "Sorry, we can't find cpu_rec installed on the system"
 	
-
+	#put together header, content, and footer
 	found[1] = "==================CPU_REC==================\n" + found[1] + "\n\n @@@@@CPU_REC@@@@@\n\n"
 	return found[1]
 		
@@ -88,9 +88,10 @@ def cpu_rec(file):
 
 #recursive helper method to determine if cpu_rec is installed on the system and where to call it from
 def cpu_recHelper(file, curdir):
-	#array of strings returned each time: first index represents whether another call has found it, second index is the output string updated if cpu_rec is found
+	#ret = array of strings returned each time: first index represents whether another call has found it, second index is the output string updated if cpu_rec is found
 	ret = ['0','']	
 	found = False
+	#scan filesystem for cpu_rec.py, call as a binwalk module if it's installed in binwalk module directory, otherwise call separately
 	for dirname, names, files in os.walk(curdir):
 		for f in files:
 			if f == 'cpu_rec.py':
@@ -104,6 +105,7 @@ def cpu_recHelper(file, curdir):
 				found = True
 				ret[0] = '1'		
 				return ret
+		#if not found in current directory, scan every other directory by repeating the call and returning 1 in the first index of ret
 		if found == False:
 			for name in names:
 				if 'binwalk' not in name:
@@ -117,7 +119,7 @@ def cpu_recHelper(file, curdir):
 #A function to run angr analysis.
 def fullAngrScan(file):
 	#File Header File
-	fullangrscan = '\n\n\n==================FULL ANGR ANALYSIS==================\n\n\n'
+	fullangrscan = '\n\n\n==================FULL ANGR ANALYSIS==================\n\n\n' #header for txt and xml
 	print('\nLoading the Binary...')
 	#Using angr to attempt to load the Binary File.
 	proj = angr.Project(file, load_options = {'auto_load_libs':False})
@@ -142,7 +144,7 @@ def fullAngrScan(file):
 	fullangrscan = fullangrscan + '\nSTACK PROTECTION:\n'
 	print(proj.loader.aslr)
 	#Adding the Stack protection to the string
-	fullangrscan = fullangrscan + str(proj.loader.aslr) + '\n' + "\n@@@@@FULL ANGR ANALYSIS@@@@@\n\n"
+	fullangrscan = fullangrscan + str(proj.loader.aslr) + '\n' + "\n@@@@@FULL ANGR ANALYSIS@@@@@\n\n" #footer
 	print('\n')
 
 	#return the string for the output file
@@ -151,27 +153,27 @@ def fullAngrScan(file):
 #A function to run angr analysis without CFG, Function list, or Stack protection.
 def halfAngrScan(file):
 	#File Header Title
-	halfangrscan = '\n\n\n==================Partial ANGR ANALYSIS==================\n\n\n'
+	halfangrscan = '\n\n\n==================Partial ANGR ANALYSIS==================\n\n\n' #header
 	print('\nLoading the Binary...')
 	#Using angr to attempt to load the Binary File.
 	proj = angr.Project(file, load_options = {'auto_load_libs':False})
 	print('\nBinary Architecture:')
 	#Print out the Binary Architecture.
 	print(proj.arch)
-	#Adding binary architecture to the string
+	#Adding binary architecture and footer to the string
 	halfangrscan = halfangrscan + '\nARCHITECTURE:\n' + str(proj.arch) + "\n\n\n@@@@@Partial ANGR ANALYSIS@@@@@\n\n"
 
 	return halfangrscan
 
 #A function to run radare2 analysis.
 def radare2Scan(filepath):
-	#setup
+	#setup, analyze binary, seek to main
 	r2 = r2pipe.open(filepath)
 	r2.cmd("aaa")
 	r2.cmd("s main")
 
 	print "\x1B[32m" + "\n\n\nR2 Analysis:\n" + "\x1B[0m"
-	output = '\n\n\n==================RADARE2==================\n\n\n'
+	output = '\n\n\n==================RADARE2==================\n\n\n' #header for txt and xml
 
 	#print basic fileinfo
 	print("\x1B[31m" + "File info: \n" + "\x1B[0m" + r2.cmd('iI~arch,bintype,bits,class,endian,lang,machine,os'))
@@ -221,7 +223,7 @@ def radare2Scan(filepath):
 	uinput = raw_input("\nDo you want to see all strings? (y/n)")
 	if uinput == 'y' or uinput == 'Y':
 		print r2.cmd("!strings " + filepath)
-	#add strings to output string
+	#add strings and footer to output string
 	output += "STRINGS: \n\n" + r2.cmd("!strings " + filepath) + "\n\n\n@@@@@RADARE2@@@@@\n\n"
 	return output
 
@@ -248,6 +250,7 @@ def output(allanalysis,outfile):
 		f.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<executedanalyses>")
 		n = 0;
 		#scan through the text for any analysis headers or footers and write an xml tag in the file instead
+		#assumes no strings are found in the binary consisting of 18 '='s or 5 '@'s
 		while n < len(allanalysis):
 			if allanalysis[n:n+18] == "==================": # header tag
 				f.write("\n\t<")
@@ -270,7 +273,7 @@ def output(allanalysis,outfile):
 			#check scan output for special or problematic xml characters and replace them		
 			else: 
 				if allanalysis[n] == "\n":
-					f.write(allanalysis[n] + "\t")
+					f.write(allanalysis[n] + "" + "\t") #update empty string based on how data will be presented and how line breaks are printed
 				elif allanalysis[n] == "<":
 					f.write("&lt;")
 				elif allanalysis[n] == ">":
@@ -281,8 +284,6 @@ def output(allanalysis,outfile):
 					f.write("&apos;")
 				elif allanalysis[n]=='\"':
 					f.write("&quot;")
-				elif allanalysis[n]=='\n':
-					f.write("&#xA;")
 				else:
 					f.write(allanalysis[n])
 				n+=1
