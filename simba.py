@@ -227,6 +227,32 @@ def radare2Scan(filepath):
 	output += "STRINGS: \n\n" + r2.cmd("!strings " + filepath) + "\n\n\n@@@@@RADARE2@@@@@\n\n"
 	return output
 
+
+#A function to run sandsifter-- pops a new terminal and runs it, summarizes the results, returns the log file
+
+
+def sandsifterHelper(curdir): #requires sandsifter directory to be located in the home directory ~
+	ret = ['0', None, file]
+	found = False
+	for dirname, names, files in os.walk(curdir):
+		
+			for name in names:
+				if 'sandsifter' in name:
+					os.chdir(os.path.abspath(os.path.join(dirname, name)))
+					print "Running sandsifter on this processor: may take hours to days"
+					print "Install capstone and sandsifter on the system whose processor you want to fuzz"
+					subprocess.call("sudo python sifter.py --unk --len --dis --sync --tick -- -P1 -t", shell=True)	
+					os.chdir(os.path.abspath(os.path.join(dirname, name)))
+					subprocess.call(["python", "summarize.py", "data/log"])
+					f = open("data/log")
+					found = True
+					ret[0]='1'
+					ret[1]=os.path.abspath(dirname)		
+					ret[2]=f
+					return ret
+	
+	return ret
+
 #A help function to explain which flags runs which scan.
 def help():
 	print ("\n \'-a\' : To run angr analysis\n \'-aB\' : To run angr analysis (no CFG, function list, stack protection)\n \'-b\' : To run binwalk signature and entropy scan\n \'-n\' : To run netcat service heartbeat\n \'-r\' : To run radare2 analysis\n \'-o\' : To tell the tool to output the scan information to a file\n \'-h\' : To get the help table (this table)\n")
